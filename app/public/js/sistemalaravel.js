@@ -1,0 +1,147 @@
+function cargarformulario(arg) {
+    if (arg == 2) {
+        var url = "form_cargar_datos_usuarios";
+    }
+
+    $("#contenido_principal").html($("#cargador_empresa").html());
+
+    $.get(url, function (resul) {
+        $("#contenido_principal").html(resul);
+    })
+
+}
+
+function cargarlistado(listado) {
+
+    if (listado == 1) {
+        var url = "listado_usuarios";
+    }
+    $("#contenido_principal").html($("#cargador_empresa").html());
+
+
+    $.get(url, function (resul) {
+
+        $("#contenido_principal").html(resul);
+    })
+
+}
+
+$(document).on("submit", ".form_entrada", function (e) {
+
+    e.preventDefault();
+
+    $('html, body').animate({scrollTop: '0px'}, 200);
+
+    var formu = $(this);
+    var quien = $(this).attr("id");
+
+    if (quien == "f_nuevo_usuario") {
+        var varurl = "agregar_nuevo_usuario";
+        var divresul = "notificacion_resul_fanu";
+    }
+    if (quien == "f_editar_usuario") {
+        var varurl = "editar_usuario";
+        var divresul = "notificacion_resul_feu";
+    }
+    if (quien == "f_cambiar_password") {
+        var varurl = "cambiar_password";
+        var divresul = "notificacion_resul_fcp";
+    }
+
+    $("#" + divresul + "").html($("#cargador_empresa").html());
+
+    $.ajax({
+
+        type: "POST",
+        url: varurl,
+        datatype: 'json',
+        data: formu.serialize(),
+        success: function (resul) {
+
+            $("#" + divresul + "").html(resul);
+            if (quien == "f_nuevo_usuario") {
+                $('#' + quien + '').trigger("reset");
+            }
+
+        }
+
+    });
+})
+
+$(document).on("click", ".pagination li a", function (e) {
+    e.preventDefault();
+    var url = $(this).attr("href");
+    $("#contenido_principal").html($("#cargador_empresa").html());
+    $.get(url, function (resul) {
+        $("#contenido_principal").html(resul);
+    })
+
+})
+
+function mostrarficha(id_usuario) {
+    $("#capa_modal").show();
+    $("#capa_para_edicion").show();
+    var url = "form_editar_usuario/" + id_usuario + "";
+    $("#capa_para_edicion").html($("#cargador_empresa").html());
+    $.get(url, function (resul) {
+        $("#capa_para_edicion").html(resul);
+    })
+
+}
+
+$(document).on("click", ".div_modal", function (e) {
+    $("#capa_modal").hide();
+    $("#capa_para_edicion").hide();
+    $("#capa_para_edicion").html("");
+})
+
+$(document).on("submit", ".formarchivo", function (e) {
+
+    e.preventDefault();
+    var formu = $(this);
+    var nombreform = $(this).attr("id");
+    var formName = $(this).attr("name");
+	
+    if (nombreform == "f_subir_imagen") {
+        var miurl = "subir_imagen_usuario";
+        var divresul = "notificacion_resul_fci"
+    }
+    if (nombreform == "f_subir_imagen_pdv") {
+        var miurl = "imagem_pdv";
+        var divresul = "notificacion_resul"
+    }
+    
+    if (nombreform == "f_cargar_datos_usuarios") {
+        var miurl = "cargar_datos_usuarios";
+        var divresul = "notificacion_resul_fcdu"
+    }
+
+    var formData = new FormData($("form[name$='" + formName + "']")[0]);
+    console.log(formData);
+    $.ajax({
+        url: miurl,
+        type: 'POST',
+        data: formData,
+        cache: false,
+        contentType: false,
+        processData: false,
+
+        beforeSend: function () {
+            $("#"+divresul+"").html($("#cargador_empresa").html());
+        },
+
+        success: function (data) {
+            $("#"+divresul+"").html(data);
+            $("#fotografia").attr('src', $("#fotografia").attr('src') + '?' + Math.random() );            
+
+        },
+
+        error: function(data) {
+            alert("There was an error Check the file and try again!");
+
+        }
+    });
+});
+
+
+
